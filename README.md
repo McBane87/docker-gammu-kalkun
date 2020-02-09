@@ -69,4 +69,8 @@ If you want to send sms using the cli. You can use either a plugin like `jsonrpc
 `php send_sms.php -u kalkun -p kalkun -n 12345678 -m 'SomeMessage\nWith Newline' -H 'http://127.0.0.1/index.php/'`  
   
 #### jsonrpc Example
-`curl -H "Content-Type: application/json" -d '{"method":"sms.send_sms", "params":{"user":"kalkun,"pass":"kalkun","phoneNumber":"123456789","message":"Testing JSONRPC\nNewline"}}' http://127.0.0.1/index.php/plugin/jsonrpc/send_sms`
+`curl -H "Content-Type: application/json" -d '{"method":"sms.send_sms", "params":{"user":"kalkun,"pass":"kalkun","phoneNumber":"123456789","message":"Testing JSONRPC\nNewline"}}' http://127.0.0.1/index.php/plugin/jsonrpc/send_sms`  
+  
+### Kalkun Plugins
+The Kalkun Website offers some plugins. But I expirienced that some or maybe even most of them don't work like expected and are bugged. So don't expect things to work like they should with those plugins.  
+For the jsonrpc plugin I made changes myself to make it work and implemented authentication. But all other plugins are untested.
