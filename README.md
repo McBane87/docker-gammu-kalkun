@@ -55,7 +55,7 @@ Here you have to pass your gsm-modem to your docker image. Many sticks provide m
 ### Security!
 Change `encryption_key` in `<path/to/opt/website/>application/config/config.php` to something else. If you don't do that, someone else with the same key maybe would be able to login to your website with his own kalkun cookie saved in his browser.  
   
-Change the password for mysql user kalkun.  
+Change the password for mysql user kalkun: `docker exec -it gammu mysql -e "ALTER USER 'gammu'@'localhost' IDENTIFIED BY '<NEWPASS>';"`  
 And update the files `<path/to/opt/website/>application/config/database.php` and `<path/to/opt/config/>gammu-smsdrc` to match the new password.  
   
 Change the user inside the kalkun website. Because default is:  
