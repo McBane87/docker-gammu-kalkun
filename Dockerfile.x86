@@ -90,13 +90,13 @@ RUN cd /var/run/ && \
 	git clone -b php5 https://github.com/back2arie/Kalkun.git && \
 	rm -rf /var/www/html/* && mv Kalkun/* /var/www/html/ && chown -R www-data:www-data /var/www/html && \
 	find /var/www/html/ -type f -exec dos2unix {} \; && \
-	cd /var/www/html && for i in $(find /var/run/patches/ -maxdepth 1 -type f -name "*-kalkun-*.patch"); do patch -p0 < $i || exit 1; done && \
+	cd /var/www/html && for i in $(find /var/run/patches/ -maxdepth 1 -type f -name "*-kalkun-*.patch" | sort -n); do patch -p0 < $i || exit 1; done && \
 	/bin/cp /var/run/patches/style/*.jpg /var/www/html/media/images/ && \
 	/bin/cp /var/run/patches/style/*.png /var/www/html/media/images/ && \
 	patch -p0 < /var/run/patches/style/style.patch && \
 	chown -R www-data:www-data /var/www/html && \
 	mkdir /var/log/gammu-smsd && \
-	cd /etc/ && for i in $(find /var/run/patches/ -maxdepth 1 -type f -name "*-gammu-*.patch"); do patch -p0 < $i || exit 1; done && \
+	cd /etc/ && for i in $(find /var/run/patches/ -maxdepth 1 -type f -name "*-gammu-*.patch" | sort -n); do patch -p0 < $i || exit 1; done && \
 	echo -e "/var/log/gammu-smsd/gammu.log {\n  rotate 5\n  size 10M\n  compress\n  missingok\n  notifempty\n}" > /etc/logrotate.d/gammu-smsd && \
 	rm -rf /var/run/Kalkun && rm -rf /var/run/patches && \
 	service mysql start && sleep 5 && \
