@@ -1,0 +1,40 @@
+--- application/plugins/jsonrpc/controllers/jsonrpc.php	2020-01-31 11:26:58.000000000 +0100
++++ application/plugins/jsonrpc/controllers/jsonrpc.php	2020-01-31 15:15:54.974843102 +0100
+@@ -14,7 +14,7 @@
+ /**
+  * JSONRPC Class
+  *
+- * @package		Kalkun
++ * @package	Kalkun
+  * @subpackage	Plugin
+  * @category	Controllers
+  */
+@@ -25,7 +25,27 @@
+ 	function __construct()
+ 	{
+ 		parent::__construct(FALSE);
+-		$this->load->library('CI_jsonrpc', NULL, 'jsonrpc');
++		$this->load->library('ci_Jsonrpc', NULL, 'jsonrpc');
++		
++		// Add login check to this plugin
++		$this->load->model('Api_model');
++		$data = @json_decode(file_get_contents("php://input"), true);
++		if ($data === NULL) {
++			$Response = new JSON_RPC_Server_Response;
++			$Response->set_error('parse_error');
++			die($Response->create_server_response());
++		}
++		$credentials['user'] = (isset($data['params']) && isset($data['params']['user'])) ? $data['params']['user'] : false;
++		$credentials['pass'] = (isset($data['params']) && isset($data['params']['pass'])) ? $data['params']['pass'] : false;
++		if (! $this->Api_model->login($credentials)) {
++			$Response = new JSON_RPC_Server_Response;
++			$Response->set_error(array(
++				'code'=> 000,
++				'name'=>'invalid login',
++				'message'=> 'Please provide valid login credentials!'
++			));
++			die($Response->create_server_response());
++		}
+ 	}
+ 	
+ 	/**

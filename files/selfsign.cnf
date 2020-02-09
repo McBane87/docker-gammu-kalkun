@@ -1,0 +1,23 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = US
+ST = SomeState
+L = SomeCity
+O = O
+OU = U
+CN = localhost
+
+[v3_req]
+#basicConstraints = CA:FALSE
+keyUsage = keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName=@subject_alt_name
+
+[subject_alt_name]
+DNS.1 = localhost
+IP.1 = 127.0.0.1

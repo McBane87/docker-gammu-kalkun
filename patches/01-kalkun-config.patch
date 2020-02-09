@@ -1,0 +1,85 @@
+--- application/config/database.php	2020-01-31 10:31:25.142210040 +0100
++++ application/config/database.php	2020-01-31 10:41:12.513456233 +0100
+@@ -37,11 +37,11 @@
+ $active_group = "default";
+ $active_record = TRUE;
+ 
+-$db['default']['hostname'] = "localhost";
++$db['default']['hostname'] = "127.0.0.1";
+ 
+ // MySQL
+-$db['default']['username'] = "root";
+-$db['default']['password'] = "password";
++$db['default']['username'] = "gammu";
++$db['default']['password'] = "MAlST101qfMy6FGYKj5d";
+ $db['default']['database'] = "kalkun";
+ $db['default']['dbdriver'] = "mysql";
+ 
+@@ -56,7 +56,7 @@
+ // $db['default']['dbdriver'] = "pdo";
+ 
+ $db['default']['dbprefix'] = "";
+-$db['default']['pconnect'] = TRUE;
++$db['default']['pconnect'] = FALSE;
+ $db['default']['db_debug'] = TRUE;
+ $db['default']['cache_on'] = FALSE;
+ $db['default']['cachedir'] = "";
+--- scripts/daemon.php	2020-01-31 10:31:25.175211010 +0100
++++ scripts/daemon.php	2020-01-31 10:26:52.000000000 +0100
+@@ -3,7 +3,7 @@
+ if(php_sapi_name() != 'cli' && !empty($_SERVER['REMOTE_ADDR'])) exit("Access Denied.");	
+ 
+ // Please configure this
+-$url = "http://localhost/kalkun";
++$url = "http://localhost";
+ 
+ fclose(fopen($url."/index.php/daemon/message_routine/", "r"));
+ 
+--- scripts/daemon.sh	2020-01-31 10:31:25.175211010 +0100
++++ scripts/daemon.sh	2020-01-31 10:26:52.000000000 +0100
+@@ -2,7 +2,7 @@
+ 
+ # Configure this (use absolute path)
+ PHP=/usr/bin/php # php cli path
+-DAEMON=/path/to/kalkun/scripts/daemon.php # daemon.php path
++DAEMON=/var/www/html/scripts/daemon.php # daemon.php path
+ 
+ # Execute
+ $PHP $DAEMON
+\ No newline at end of file
+--- scripts/external/translator/translator.php	2020-01-31 10:31:25.175211010 +0100
++++ scripts/external/translator/translator.php	2020-01-31 10:26:52.000000000 +0100
+@@ -10,7 +10,7 @@
+ // ------------------------------------------------------------------------
+  
+ define('GTranslate_path', "/path/to/gtranslate-api-php/GTranslate.php");
+-define('Kalkun_API_path', "/path/to/kalkun/scripts/cURL/Kalkun_API.php");
++define('Kalkun_API_path', "/var/www/html/scripts/cURL/Kalkun_API.php");
+ 
+ $arg_list = $_SERVER['argv'];
+ $arg_count = count($arg_list);
+--- scripts/outbox_queue.sh	2020-01-31 10:31:25.176211039 +0100
++++ scripts/outbox_queue.sh	2020-01-31 10:26:52.000000000 +0100
+@@ -2,7 +2,7 @@
+ 
+ # Configure this (use absolute path)
+ PHP=/usr/bin/php # php cli path
+-DAEMON=/path/to/kalkun/scripts/outbox_queue.php # daemon.php path
++DAEMON=/var/www/html/scripts/outbox_queue.php # daemon.php path
+ 
+ # Execute
+ $PHP $DAEMON
+--- application/config/kalkun_settings.php	2020-01-31 11:26:58.000000000 +0100
++++ application/config/kalkun_settings.php	2020-01-31 14:22:04.872110498 +0100
+@@ -54,9 +54,9 @@
+ | Windows : C:\Program Files\Gammu 1.29.92\bin\
+ |
+ */
+-$config['gammu_path'] = "C:\Gammu 1.29.92\bin\\";
++$config['gammu_path'] = "/usr/bin/";
+ $config['gammu_sms_inject'] = $config['gammu_path']."gammu-smsd-inject";
+-$config['gammu_config'] = $config['gammu_path']."config.ini";
++$config['gammu_config'] = "/etc/gammu-smsdrc";
+ 
+ 
+ /*

@@ -1,0 +1,89 @@
+--- application/controllers/kalkun.php	2020-01-31 15:39:48.000000000 +0100
++++ application/controllers/kalkun.php	2020-02-09 09:32:39.006578372 +0100
+@@ -364,7 +364,7 @@
+ 		if($_POST && $type=='save') { 		
+ 			$option = $this->input->post('option');
+ 			// check password
+-			if($option=='password' && sha1($this->input->post('current_password'))!=$this->Kalkun_model->get_setting()->row('password')) 
++			if($option=='password' && !password_verify($this->input->post('current_password'), $this->Kalkun_model->get_setting()->row('password'))) 
+ 			{
+ 				$this->session->set_flashdata('notif', 'You entered wrong password');
+ 				redirect('settings/'.$option);
+--- application/models/api_model.php	2020-01-31 15:39:49.000000000 +0100
++++ application/models/api_model.php	2020-02-09 09:43:29.848879822 +0100
+@@ -46,16 +46,15 @@
+ 		if ($credentials === false) return false;
+ 		
+ 		$username = (isset($credentials['user'])) ? $credentials['user'] : false;
+-		$password = (isset($credentials['pass'])) ? sha1($credentials['pass']) : false;
++		$password = (isset($credentials['pass'])) ? $credentials['pass'] : false;
+ 		
+ 		if (empty($username) || $username === false || empty($password) || $password === false) return false;
+ 		
+ 		$this->db->from('user');
+ 		$this->db->where('username', $username);
+-		$this->db->where('password', $password);
+ 		$query = $this->db->get();
+ 		
+-		if($query->num_rows()=='1') {
++		if($query->num_rows()=='1' && password_verify($password, $query->row('password'))) {
+ 			return true;
+ 		}
+ 		else return false;
+--- application/models/kalkun_model.php	2020-01-31 15:39:48.000000000 +0100
++++ application/models/kalkun_model.php	2020-02-09 09:40:56.134607257 +0100
+@@ -44,13 +44,11 @@
+ 	function login()
+ 	{
+ 		$username = $this->input->post('username');
+-		$password = sha1($this->input->post('password'));
+ 		$this->db->from('user');
+ 		$this->db->where('username', $username);
+-		$this->db->where('password', $password);
+ 		$query = $this->db->get();
+ 		
+-		if($query->num_rows()=='1') {
++		if($query->num_rows()=='1' && password_verify($this->input->post('password'), $query->row('password'))) {
+ 			$this->session->set_userdata('loggedin', 'TRUE');
+ 			$this->session->set_userdata('level', $query->row('level'));
+ 			$this->session->set_userdata('id_user', $query->row('id_user'));
+@@ -327,7 +325,7 @@
+ 			break;
+ 			
+ 			case 'password':
+-				$this->db->set('password', sha1($this->input->post('new_password')));
++				$this->db->set('password', password_hash($this->input->post('new_password'), PASSWORD_BCRYPT));
+ 				$this->db->where('id_user', $this->session->userdata('id_user'));
+ 				$this->db->update('user');				
+ 			break;
+@@ -359,7 +357,7 @@
+ 	 */	
+     function update_password($uid = NULL)
+ 	{
+-		$this->db->set('password', sha1($this->input->post('new_password')));
++		$this->db->set('password', password_hash($this->input->post('new_password'), PASSWORD_BCRYPT));
+ 		$this->db->where('id_user', $uid);
+ 		$this->db->update('user');
+ 	}
+--- application/models/user_model.php	2020-01-31 15:39:48.000000000 +0100
++++ application/models/user_model.php	2020-02-09 09:21:25.408533306 +0100
+@@ -91,7 +91,7 @@
+ 		}
+ 		else 
+ 		{
+-			$this->db->set('password', sha1($this->input->post('password')));
++			$this->db->set('password', password_hash($this->input->post('password'), PASSWORD_BCRYPT));
+ 			$this->db->insert('user');
+ 			
+ 			// user_settings
+--- media/db/mysql_kalkun.sql	2020-01-31 15:39:49.000000000 +0100
++++ media/db/mysql_kalkun.sql	2020-02-09 09:47:00.738113548 +0100
+@@ -67,7 +67,7 @@
+ --
+ 
+ INSERT INTO `user` (`id_user`, `username`, `realname`, `password`, `phone_number`, `level`) VALUES
+-(1, 'kalkun', 'Kalkun SMS', 'f0af18413d1c9e0366d8d1273160f55d5efeddfe', '123456789', 'admin');
++(1, 'kalkun', 'Kalkun SMS', '$2y$10$Sg0IxngRIIp1qNITM8kWa.aJ26w58F97ByTzDKoRF/dyzKcLfx226', '123456789', 'admin');
+ 
+ 
+ -- --------------------------------------------------------

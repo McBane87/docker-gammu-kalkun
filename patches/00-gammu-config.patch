@@ -1,0 +1,27 @@
+--- gammu-smsdrc	2020-01-31 11:19:29.000000000 +0100
++++ gammu-smsdrc	2020-01-31 11:19:29.000000000 +0100
+@@ -3,15 +3,21 @@
+ # Gammu library configuration, see gammurc(5)
+ [gammu]
+ # Please configure this!
+-port = /dev/null
++port = /dev/ttyUSB0
+ connection = at
+ # Debugging
+ #logformat = textall
+ 
+ # SMSD configuration, see gammu-smsdrc(5)
+ [smsd]
+-service = files
+-logfile = syslog
++runonreceive = /var/www/html/scripts/daemon.sh
++service = sql
++driver = native_mysql
++host = 127.0.0.1
++database = kalkun
++user = gammu
++password = MAlST101qfMy6FGYKj5d
++logfile = /var/log/gammu-smsd/gammu.log
+ # Increase for debugging information
+ debuglevel = 0
+ 
