@@ -52,4 +52,21 @@ docker create \
 ### Devices (--devices)
 Here you have to pass your gsm-modem to your docker image. Many sticks provide more than one device. So you have to find out yourself which device is needed. By default gammu-smsd is looking for `/dev/ttyUSB0` inside the image. So you should pass the working device to this device inside. But you should also pass all the other devices to the docker image. Because I experienced unstable behaviour in my tests if I only passed one of the three devices....
 
-### Misc things to do
+### Security!
+Change `encryption_key` in `<path/to/opt/website/>application/config/config.php` to something else. If you don't do that, someone else with the same key maybe would be able to login to your website with his own kalkun cookie saved in his browser.  
+  
+Change the password for mysql user kalkun.  
+And update the files `<path/to/opt/website/>application/config/database.php` and `<path/to/opt/config/>gammu-smsdrc` to match the new password.  
+  
+Change the user inside the kalkun website. Because default is:  
+User: kalkun  
+Pass: kalkun  
+  
+### API
+If you want to send sms using the cli. You can use either a plugin like `jsonrpc` or you use the buildin API of kalkun. With a script I've added to the GIT in `other/send_sms.php`.  
+  
+#### send_sms.php Example
+`php send_sms.php -u kalkun -p kalkun -n 12345678 -m 'SomeMessage\nWith Newline' -H 'http://127.0.0.1/index.php/'`  
+  
+#### jsonrpc Example
+`curl -H "Content-Type: application/json" -d '{"method":"sms.send_sms", "params":{"user":"kalkun,"pass":"kalkun","phoneNumber":"123456789","message":"Testing JSONRPC\nNewline"}}' http://127.0.0.1/index.php/plugin/jsonrpc/send_sms`
