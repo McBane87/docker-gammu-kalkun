@@ -180,8 +180,8 @@ if (isset($options['h'])) {
         echo "Options:\n";
         echo "\t -u <UserName>\t Username to use for Login into Kalkun\n";
         echo "\t -p <Password>\t Password to use for Login into Kalkun\n";
-        echo "\t -n <Password>\t Phonenumber to send SMS to\n";
-        echo "\t -m <Password>\t Message of SMS\n";
+        echo "\t -n <Number>\t Phonenumber to send SMS to\n";
+        echo "\t -m <Message>\t Message of SMS\n";
         echo "\t -t <CookieDir>\t Writeable directory where temporary cookie will be saved. (Default: /tmp)\n";
         echo "\t -H <URL>\t URL to Kalkun. (Default: http://127.0.0.1/index.php/)\n";
         echo "\n";
