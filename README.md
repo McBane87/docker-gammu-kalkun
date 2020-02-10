@@ -3,6 +3,14 @@
 This Docker image will provide gammu-smsd + apache2 + php5.6 + mysql + kalkun + systemd + some others.  
 So because it is based on systemd and has all needed packages included at once, this image isn't lightweight. Expect 900MB - 1000MB of disk space!
 
+### Tags
+|Tag|Architecture|
+|-----|------------------|
+|latest|amd64|
+|i386|i386|
+|arm32v7|armhf|
+|arm64v8|arm64|
+
 ### HowTo build
 
 Thanks to the awesome work of [balenalib](https://hub.docker.com/u/balenalib),  
