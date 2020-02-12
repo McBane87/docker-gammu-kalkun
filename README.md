@@ -43,6 +43,50 @@ docker create \
         --restart=always \
         gammu
  ```
+ 
+ Unfortunately the creation described above has a downside.  
+ If the device gets removed and reattched, then the container won't have access anymore and you are forced to restart the container.  
+ 
+ But there is a solution if you have a newer docker version.  
+ Instead of using `--device ...` you can have a look which major number your device is using.  
+ This can be done by doing this:  
+ ```
+ ls -l /dev/serial/by-id/
+ 
+ lrwxrwxrwx 1 root root 13 Feb 11 17:43 usb-ZTE-if00-port0 -> ../../ttyUSB0
+ lrwxrwxrwx 1 root root 13 Feb 11 17:43 usb-ZTE-if01-port0 -> ../../ttyUSB2
+ lrwxrwxrwx 1 root root 13 Feb 11 17:43 usb-ZTE-if02-port0 -> ../../ttyUSB3
+ 
+ ls -l /dev/ttyUSB*
+ 
+ crw-rw---- 1 root dialout 188, 0 Feb 11 17:43 /dev/ttyUSB0
+ crw-rw---- 1 root dialout 188, 2 Feb 12 19:06 /dev/ttyUSB2
+ crw-rw---- 1 root dialout 188, 3 Feb 11 17:43 /dev/ttyUSB3
+ ```
+ 
+ As you can see, the 3 devices of my modem are having the major number `188`.  
+ So I will now use the `--device-cgroup-rule` to allow my container access the the devices like this:
+ 
+ ```
+docker create \
+        --name gammu \
+        --device-cgroup-rule='c 188:* rmw' \
+        --v  /dev/serial/by-id/usb-ZTE-if00-port0:/dev/ttyUSB0 \
+        --v  /dev/serial/by-id/usb-ZTE-if01-port0:/dev/ttyUSB1 \
+        --v  /dev/serial/by-id/usb-ZTE-if02-port0:/dev/ttyUSB2 \
+        -e TZ=Europe/London \
+        -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+        -v <SomePath>:/opt/configs \
+        -v <SomePath>:/opt/website \
+        -v <SomePath>:/opt/data \
+        -v <SomePath>:/opt/logs \
+        -p 80:80 \
+        -p 443:443 \
+        --tmpfs /run \
+        --tmpfs /run/lock \
+        --restart=always \
+        gammu
+ ```
 
 ### Environment
 | Variable      | Default       | Description                                |
