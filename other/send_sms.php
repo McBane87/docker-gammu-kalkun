@@ -194,7 +194,8 @@ $required = array('u','p','n','m','H','t');
 
 foreach ($required as $r) {
         if (!isset($options[$r]) || !$options[$r] || trim($options[$r]) == "") {
-                exit("Required option \"-$r\" not set!\n");
+                echo "Required option \"-$r\" not set!\n";
+		exit(1);
         }
 }
 
