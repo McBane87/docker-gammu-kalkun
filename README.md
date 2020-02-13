@@ -68,7 +68,7 @@ docker create \
  So I will now use the option `--device-cgroup-rule='c 188:* rmw'` to allow my container access the the devices.  
  
  Additionally to this you need to find a way to keep your device files inside the docker uptodate.  
- I've created a cronjob `vi /etc/crontab` for this:  
+ I've created a cronjob `vi /etc/crontab` (outside container!) for this:  
  ```
  */1 *   * * *   root    mkdir -p  /dev/docker/gammu 2>/dev/null; for i in $(find /dev/serial/by-id/ -maxdepth 1 -mindepth 1 -type l -name "usb-ZTE-if*"); do /bin/cp -afu $(readlink -f $i) /dev/docker/gammu/$(basename $i) 2>/dev/null; done
  ```
