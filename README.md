@@ -65,15 +65,27 @@ docker create \
  ```
  
  As you can see, the 3 devices of my modem are having the major number `188`.  
- So I will now use the `--device-cgroup-rule` to allow my container access the the devices like this:
+ So I will now use the option `--device-cgroup-rule='c 188:* rmw'` to allow my container access the the devices.  
  
+ Additionally to this you need to find a way to keep your device files inside the docker uptodate.  
+ I've created a cronjob `vi /etc/crontab` for this:  
+ ```
+ */1 *   * * *   root    mkdir -p  /dev/docker/gammu 2>/dev/null; for i in $(find /dev/serial/by-id/ -maxdepth 1 -mindepth 1 -type l -name "usb-ZTE-if*"); do /bin/cp -afu $(readlink -f $i) /dev/docker/gammu/$(basename $i) 2>/dev/null; done
+ ```
+ What the line above does, is the follwoing:  
+ * Create directory `/dev/docker/gammu` (we ignore already exists errors with `2>/dev/null`)
+ * Find all files inside `/dev/serial/by-id/` with name `usb-ZTE-if*`
+ * Follow symlink (`readlink -f`) for those files and copy them to `/dev/docker/gammu/` if there is a newer/updated file (the files copied will keep their symlink name, but won't be symlinks anymore)
+ 
+ Also make sure to edit `/opt/config/gammu-smsdrc` (this is the path inside container, outside path depends on your choices) and update the `port = ttyUSB0` to match your new device name, which is accessable from inside container. (e.g.: `port = /dev/serial/by-id/usb-ZTE-if00-port0`)
+ 
+ After all this is done we can create our docker container like this:
+  
  ```
 docker create \
         --name gammu \
         --device-cgroup-rule='c 188:* rmw' \
-        --v  /dev/serial/by-id/usb-ZTE-if00-port0:/dev/ttyUSB0 \
-        --v  /dev/serial/by-id/usb-ZTE-if01-port0:/dev/ttyUSB1 \
-        --v  /dev/serial/by-id/usb-ZTE-if02-port0:/dev/ttyUSB2 \
+        -v /dev/docker/gammu:/dev/serial/by-id \
         -e TZ=Europe/London \
         -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
         -v <SomePath>:/opt/configs \
