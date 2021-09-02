@@ -10,27 +10,15 @@ RUN [ "cross-build-start" ]
 
 RUN ln -sf /bin/bash /bin/sh.real
 
-# Systemd implementation ###############################################################
+# Supervisor implementation ###############################################################
 
 ENV container docker
 
 RUN apt-get update \
-    && apt-get install -y tzdata systemd cron logrotate rsyslog \
+    && apt-get install -y tzdata cron logrotate supervisor \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 	
-RUN rm -f /lib/systemd/system/multi-user.target.wants/* \
-    /etc/systemd/system/*.wants/* \
-    /lib/systemd/system/local-fs.target.wants/* \
-    /lib/systemd/system/sockets.target.wants/*udev* \
-    /lib/systemd/system/sockets.target.wants/*initctl* \
-    /lib/systemd/system/sysinit.target.wants/systemd-tmpfiles-setup* \
-    /lib/systemd/system/systemd-update-utmp*
-	
-RUN systemctl enable rsyslog \
-	&& systemctl enable cron \
-	&& systemctl disable exim4
-
 # Careful! Docker remove Lines with leading '#', even if they are inside an echo statement!	
 RUN mkdir /etc/pre.systemd.d && echo -e "#!/bin/bash\n\
 \n\
@@ -44,16 +32,20 @@ if [ -d /etc/pre.systemd.d ]; then\n\
     done\n\
 fi\n\
 \n\
-echo \"[\$(date +'%Y-%m-%d %H:%I:%S')] Starting Systemd...\"\n\
-exec /lib/systemd/systemd\
-" > /sbin/init-systemd.sh && chmod 700 /sbin/init-systemd.sh
+echo \"[\$(date +'%Y-%m-%d %H:%I:%S')] Starting Supervisord...\"\n\
+exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf -n\
+" > /sbin/init.sh && chmod 700 /sbin/init.sh
 
-STOPSIGNAL SIGRTMIN+3
-VOLUME [ "/sys/fs/cgroup" ]
-CMD ["/sbin/init-systemd.sh"]
+CMD ["/sbin/init.sh"]
+
+# Autostart disabled for now. Will be enabled later!
+COPY files/sv-cron.conf /etc/supervisor/conf.d/cron.conf
+COPY files/sv-mariadb.conf /etc/supervisor/conf.d/mariadb.conf
+COPY files/sv-gammu.conf /etc/supervisor/conf.d/gammu.conf
+COPY files/sv-apache2.conf /etc/supervisor/conf.d/apache2.conf
 
 #####################################################################################
-### docker run --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro ###
+### docker run --tmpfs /run --tmpfs /run/lock                                     ###
 #####################################################################################
 
 ########################################################################################
@@ -70,7 +62,6 @@ RUN apt-get update && \
 	apt-get dist-upgrade -y && \
 	apt-get install -y mariadb-server mariadb-client apache2 busybox gammu gammu-smsd curl wget git rsync bash-completion && \
 	mkdir /xbin && /bin/busybox --install -s /xbin && \
-	systemctl disable rsync && \
 	mkdir /var/run/gammu-deb && chmod 777 /var/run/gammu-deb && cd /var/run/gammu-deb && \
 	apt-get download -y gammu-smsd && dpkg -x *.deb . && \
 	cp -a usr/share/doc/gammu-smsd/examples/mysql*.sql.gz /usr/share/doc/gammu-smsd/examples/ && \
@@ -102,13 +93,14 @@ RUN cd /var/run/ && \
 	cd /etc/ && for i in $(find /var/run/patches/ -maxdepth 1 -type f -name "*-gammu-*.patch" | sort -n); do patch -p0 < $i || exit 1; done && \
 	echo -e "/var/log/gammu-smsd/gammu.log {\n  rotate 5\n  size 10M\n  compress\n  missingok\n  notifempty\n}" > /etc/logrotate.d/gammu-smsd && \
 	rm -rf /var/run/Kalkun && rm -rf /var/run/patches && \
-	service mysql start && sleep 5 && \
+	/usr/bin/supervisord -c /etc/supervisor/supervisord.conf && \
+	supervisorctl start mariadb && sleep 5 && \
 	mysql -e 'CREATE DATABASE kalkun;' && \
 	bash -c 'zcat /usr/share/doc/gammu-smsd/examples/mysql.sql.gz | mysql kalkun' && \
 	mysql kalkun < /var/www/html/media/db/mysql_kalkun.sql && \
 	mysql -e "GRANT USAGE on *.* to 'gammu'@'localhost' IDENTIFIED BY 'MAlST101qfMy6FGYKj5d';" && \
 	mysql -e "GRANT ALL PRIVILEGES on kalkun.* to 'gammu'@'localhost';" && \
-	sleep 5 && service mysql stop
+	sleep 5 && supervisorctl stop mariadb && killall supervisord || true
 	
 RUN mkdir /opt/{configs,logs,data} && \
 	mv /etc/apache2 /etc/apache2.dist && \
@@ -140,10 +132,8 @@ COPY files/selfsign.cnf /etc/ssl/
 COPY files/selfsign.sh /etc/ssl/
 COPY files/00-docker-init.sh /etc/pre.systemd.d/
 
-RUN BASE=/etc/systemd/system && \
-	for i in {apache2,cron,gammu-smsd,mariadb,rsyslog}; do \
-		mkdir $BASE/${i}.service.d && echo -e '[Unit]\nStartLimitBurst=3\nStartLimitIntervalSec=10\n\n[Service]\nRestart=always\nRestartSec=5' > $BASE/${i}.service.d/override.conf \
-	; done
+RUN find /etc/supervisor/conf.d/{cron,mariadb,gammu,apache2}.conf | \
+	xargs -n1 sed -i 's/autostart=false/autostart=true/g'
 
 RUN [ "cross-build-end" ]
 	
