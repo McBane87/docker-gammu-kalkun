@@ -64,6 +64,11 @@ fi
 if [[ -z "$(ls -A /opt/configs/apache2/ssl 2>/dev/null)" ]]; then
 	logPrint "Empty directory \"/opt/configs/apache2/ssl\". Creating selfsign certs..."
 	/etc/ssl/selfsign.sh /etc/ssl/selfsign.cnf /opt/configs/apache2/ssl >/dev/null
-fi	
+fi
+
+chown -Rh  mysql:mysql /opt/logs/mysql
+chown -Rh  gammu:gammu /opt/logs/gammu-smsd
+chown -Rh  mysql:mysql /opt/data/mysql
+install -m 755 -o gammu -g gammu -d /var/run/gammu
 
 exit 0
