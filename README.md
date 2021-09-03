@@ -1,7 +1,7 @@
 # docker-gammu-kalkun
 
-This Docker image will provide gammu-smsd + apache2 + php5.6 + mysql + kalkun + systemd + some others.  
-So because it is based on systemd and has all needed packages included at once, this image isn't lightweight. Expect 900MB - 1000MB of disk space!
+This Docker image will provide gammu-smsd + apache2 + php5.6 + mysql + kalkun + supervisord + some others.  
+So because it is based on supervisord and has all needed packages included at once, this image isn't lightweight. Expect 900MB - 1000MB of disk space!
 
 ### Tags
 |Tag|Architecture|
@@ -15,7 +15,7 @@ So because it is based on systemd and has all needed packages included at once, 
 
 Thanks to the awesome work of [balenalib](https://hub.docker.com/u/balenalib),  
 I was able to cross build this image for arm and aarch64.  
-This means, all build are done using a x86_64 machine, but after build can be run on target architechture.
+This means, all builds are done using a x86_64 machine, but after build is done, they can be used on the target architechture.
 
 ```
 docker build \
