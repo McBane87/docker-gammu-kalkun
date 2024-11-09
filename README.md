@@ -1,7 +1,7 @@
 # docker-gammu-kalkun
 
-This Docker image will provide gammu-smsd + apache2 + php5.6 + mysql + kalkun + supervisord + some others.
-So because it is based on supervisord and has all needed packages included at once, this image isn't lightweight. Expect 900MB - 1000MB of disk space!
+This Docker image will provide gammu-smsd + apache2 + php + mariadb + kalkun.
+So because it is based on supervisord and has all needed packages included at once, this image isn't lightweight. Expect 650MB - 750MB of disk space!
 
 ### Tags
 |Tag|Architecture|
