@@ -1,0 +1,9 @@
+--- ./.htaccess	2024-11-03 08:48:55.299541691 +0000
++++ ./.htaccess	2024-11-03 10:40:55.926880632 +0000
+@@ -2,5 +2,5 @@
+ <IfModule mod_env.c>
+     # Set this value to one of: development testing production
+     # See: https://codeigniter.com/userguide3/general/environments.html
+-    SetEnv CI_ENV development
++    SetEnv CI_ENV production
+ </IfModule>

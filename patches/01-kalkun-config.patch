@@ -1,85 +1,112 @@
---- application/config/database.php	2020-01-31 10:31:25.142210040 +0100
-+++ application/config/database.php	2020-01-31 10:41:12.513456233 +0100
-@@ -37,11 +37,11 @@
- $active_group = "default";
- $active_record = TRUE;
- 
--$db['default']['hostname'] = "localhost";
-+$db['default']['hostname'] = "127.0.0.1";
- 
- // MySQL
--$db['default']['username'] = "root";
--$db['default']['password'] = "password";
-+$db['default']['username'] = "gammu";
-+$db['default']['password'] = "MAlST101qfMy6FGYKj5d";
- $db['default']['database'] = "kalkun";
- $db['default']['dbdriver'] = "mysql";
- 
-@@ -56,7 +56,7 @@
- // $db['default']['dbdriver'] = "pdo";
- 
- $db['default']['dbprefix'] = "";
--$db['default']['pconnect'] = TRUE;
-+$db['default']['pconnect'] = FALSE;
- $db['default']['db_debug'] = TRUE;
- $db['default']['cache_on'] = FALSE;
- $db['default']['cachedir'] = "";
---- scripts/daemon.php	2020-01-31 10:31:25.175211010 +0100
-+++ scripts/daemon.php	2020-01-31 10:26:52.000000000 +0100
-@@ -3,7 +3,7 @@
- if(php_sapi_name() != 'cli' && !empty($_SERVER['REMOTE_ADDR'])) exit("Access Denied.");	
- 
+--- application/config/database.php	2024-11-03 08:48:55.300541692 +0000
++++ application/config/database.php	2024-11-03 09:21:57.870814599 +0000
+@@ -100,8 +100,8 @@
+ $db['kalkun_mysql'] = array(
+ 	'dsn'	=> '',
+ 	'hostname' => '127.0.0.1',
+-	'username' => 'root',
+-	'password' => 'password',
++	'username' => 'gammu',
++	'password' => 'MAlST101qfMy6FGYKj5d',
+ 	'database' => 'kalkun',
+ 	'dbdriver' => 'mysqli',
+ 	'dbprefix' => '',
+--- scripts/daemon.php	2024-11-03 08:48:55.366541802 +0000
++++ scripts/daemon.php	2024-11-03 09:21:57.195813478 +0000
+@@ -6,7 +6,7 @@
+ }
+
  // Please configure this
--$url = "http://localhost/kalkun";
-+$url = "http://localhost";
- 
- fclose(fopen($url."/index.php/daemon/message_routine/", "r"));
- 
---- scripts/daemon.sh	2020-01-31 10:31:25.175211010 +0100
-+++ scripts/daemon.sh	2020-01-31 10:26:52.000000000 +0100
+-$url = 'http://localhost/kalkun';
++$url = 'http://localhost';
+
+ $result = file_get_contents($url.'/index.php/daemon/message_routine/');
+
+--- scripts/daemon.sh	2024-11-03 08:48:55.366541802 +0000
++++ scripts/daemon.sh	2024-11-03 09:21:56.553812412 +0000
 @@ -2,7 +2,7 @@
- 
+
  # Configure this (use absolute path)
  PHP=/usr/bin/php # php cli path
 -DAEMON=/path/to/kalkun/scripts/daemon.php # daemon.php path
 +DAEMON=/var/www/html/scripts/daemon.php # daemon.php path
- 
+
  # Execute
  $PHP $DAEMON
 \ No newline at end of file
---- scripts/external/translator/translator.php	2020-01-31 10:31:25.175211010 +0100
-+++ scripts/external/translator/translator.php	2020-01-31 10:26:52.000000000 +0100
+--- scripts/external/translator/translator.php	2024-11-03 08:48:55.366541802 +0000
++++ scripts/external/translator/translator.php	2024-11-03 09:21:55.722811030 +0000
 @@ -10,7 +10,7 @@
  // ------------------------------------------------------------------------
-  
- define('GTranslate_path', "/path/to/gtranslate-api-php/GTranslate.php");
--define('Kalkun_API_path', "/path/to/kalkun/scripts/cURL/Kalkun_API.php");
-+define('Kalkun_API_path', "/var/www/html/scripts/cURL/Kalkun_API.php");
- 
+
+ define('GTranslate_path', '/path/to/gtranslate-api-php/GTranslate.php');
+-define('Kalkun_API_path', '/path/to/kalkun/scripts/cURL/Kalkun_API.php');
++define('Kalkun_API_path', '/var/www/html/scripts/cURL/Kalkun_API.php');
+
  $arg_list = $_SERVER['argv'];
  $arg_count = count($arg_list);
---- scripts/outbox_queue.sh	2020-01-31 10:31:25.176211039 +0100
-+++ scripts/outbox_queue.sh	2020-01-31 10:26:52.000000000 +0100
+--- scripts/outbox_queue.sh	2024-11-03 08:48:55.366541802 +0000
++++ scripts/outbox_queue.sh	2024-11-03 09:21:54.970809785 +0000
 @@ -2,7 +2,7 @@
- 
+
  # Configure this (use absolute path)
  PHP=/usr/bin/php # php cli path
 -DAEMON=/path/to/kalkun/scripts/outbox_queue.php # daemon.php path
 +DAEMON=/var/www/html/scripts/outbox_queue.php # daemon.php path
- 
+
  # Execute
  $PHP $DAEMON
---- application/config/kalkun_settings.php	2020-01-31 11:26:58.000000000 +0100
-+++ application/config/kalkun_settings.php	2020-01-31 14:22:04.872110498 +0100
-@@ -54,9 +54,9 @@
- | Windows : C:\Program Files\Gammu 1.29.92\bin\
+--- application/config/kalkun_settings.php	2024-11-03 08:48:55.300541692 +0000
++++ application/config/kalkun_settings.php	2024-11-03 09:21:53.948808085 +0000
+@@ -66,9 +66,9 @@
+ | Windows : C:\Program Files\Gammu 1.29.92\bin
  |
  */
--$config['gammu_path'] = "C:\Gammu 1.29.92\bin\\";
-+$config['gammu_path'] = "/usr/bin/";
- $config['gammu_sms_inject'] = $config['gammu_path']."gammu-smsd-inject";
--$config['gammu_config'] = $config['gammu_path']."config.ini";
-+$config['gammu_config'] = "/etc/gammu-smsdrc";
- 
- 
+-$config['gammu_path'] = 'C:\Gammu 1.29.92\bin';
++$config['gammu_path'] = '/usr/bin/';
+ $config['gammu_sms_inject'] = $config['gammu_path'].DIRECTORY_SEPARATOR.'gammu-smsd-inject';
+-$config['gammu_config'] = $config['gammu_path'].DIRECTORY_SEPARATOR.'config.ini';
++$config['gammu_config'] = '/etc/gammu-smsdrc';
+
  /*
+ |--------------------------------------------------------------------------
+--- application/config/config.php	2024-11-05 12:43:31.645458893 +0000
++++ application/config/config.php	2024-11-05 14:26:20.789317184 +0000
+@@ -148,7 +148,7 @@
+ | Note: This will NOT disable or override the CodeIgniter-specific
+ |	autoloading (application/config/autoload.php)
+ */
+-$config['composer_autoload'] = 'vendor/autoload.php';
++$config['composer_autoload'] = '../vendor/autoload.php';
+
+ /*
+ |--------------------------------------------------------------------------
+@@ -483,7 +483,7 @@
+ $config['csrf_cookie_name'] = 'kalkun_csrf_cookie';
+ $config['csrf_expire'] = 7200;
+ $config['csrf_regenerate'] = TRUE;
+-$config['csrf_exclude_uris'] = array();
++$config['csrf_exclude_uris'] = array("plugin/(?:jsonrpc|rest_api|soap|xmlrpc)/.*");
+
+ /*
+ |--------------------------------------------------------------------------
+--- index.php.orig	2024-11-05 15:12:49.241569398 +0000
++++ index.php	2024-11-05 15:27:31.205437450 +0000
+@@ -97,7 +97,7 @@
+  * This variable must contain the name of your "system" directory.
+  * Set the path if it is not in the same directory as this file.
+  */
+-	$system_path = 'vendor/codeigniter/framework/system';
++	$system_path = '../vendor/codeigniter/framework/system';
+
+ /*
+  *---------------------------------------------------------------
+@@ -114,7 +114,7 @@
+  *
+  * NO TRAILING SLASH!
+  */
+-	$application_folder = 'application';
++	$application_folder = '../application';
+
+ /*
+  *---------------------------------------------------------------

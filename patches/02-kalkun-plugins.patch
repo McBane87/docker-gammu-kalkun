@@ -1,100 +1,56 @@
---- system/libraries/Loader.php	2020-01-31 11:26:58.000000000 +0100
-+++ system/libraries/Loader.php	2020-01-31 13:42:11.795159364 +0100
-@@ -830,6 +830,28 @@
- 			}
- 		} // END FOREACH
- 
-+		// Try to check with kalkun plugins logic
-+		$backtrace = debug_backtrace();
-+		foreach ($backtrace as $k => $b) {
-+			if ($k >= 2) break;
-+			if (isset($b['file']) && preg_match(';/application/plugins/;', $b['file'])) {
-+				$filepath = array();
-+				foreach (array($class, ucfirst($class), strtolower($class)) as $class) {
-+					$filepath[] = dirname($b['file']).'/libraries/'.$class.EXT;
-+					$filepath[] = dirname($b['file']).'/../libraries/'.$class.EXT;
-+					$filepath[] = dirname($b['file']).'/'.$class.EXT;
-+					$filepath[] = dirname($b['file']).'/../'.$class.EXT;
-+					foreach ($filepath as $f) {
-+						//echo $f."<br>";
-+						if ( file_exists($f) ) {
-+							$backtrace = NULL;
-+							return $this->_ci_init_class($class, dirname($f).'/', $params, $object_name);
-+						}
-+					}
-+				}
-+			}
-+		}
-+		
- 		// One last attempt.  Maybe the library is in a subdirectory, but it wasn't specified?
- 		if ($subdir == '')
- 		{
---- /dev/null	2020-01-31 15:28:02.904385989 +0100
-+++ application/models/api_model.php	2020-01-31 14:46:49.430161635 +0100
-@@ -0,0 +1,67 @@
+--- /dev/null	2024-11-05 10:18:18.264113631 +0000
++++ application/models/Api_model.php	2024-11-05 15:09:39.317167125 +0000
+@@ -0,0 +1,54 @@
 +<?php
-+/**
-+ * Kalkun
-+ * An open source web based SMS Management
-+ *
-+ * @package		Kalkun
-+ * @author		Kalkun Dev Team
-+ * @license		http://kalkun.sourceforge.net/license.php
-+ * @link		http://kalkun.sourceforge.net
-+ */
-+
-+// ------------------------------------------------------------------------
-+
 +/**
 + * Api_model Class
 + *
-+ * Define methods for plugins 
++ * Define methods for plugins
 + *
 + * @package	Kalkun
 + * @subpackage	Api
 + * @category	Models
 + */
-+class Api_model extends Model {
++class Api_model extends MY_Model {
 +
 +	/**
 +	 * Constructor
 +	 *
 +	 * @access	public
-+	 */	
-+	function Api_model()
++	 */
++	function __construct()
 +	{
-+		parent::Model();
++		parent::__construct();
 +	}
-+	
++
 +	// --------------------------------------------------------------------
-+	
++
 +	/**
 +	 * Login
 +	 *
 +	 * Check login credential
 +	 *
-+	 * @access	public   		 
-+	 */	
++	 * @access	public
++	 */
 +	function login($credentials = false)
 +	{
 +		if ($credentials === false) return false;
-+		
++
 +		$username = (isset($credentials['user'])) ? $credentials['user'] : false;
-+		$password = (isset($credentials['pass'])) ? sha1($credentials['pass']) : false;
-+		
++		$password = (isset($credentials['pass'])) ? $credentials['pass'] : false;
++
 +		if (empty($username) || $username === false || empty($password) || $password === false) return false;
-+		
++
 +		$this->db->from('user');
 +		$this->db->where('username', $username);
-+		$this->db->where('password', $password);
 +		$query = $this->db->get();
-+		
-+		if($query->num_rows()=='1') {
++
++		if($query->num_rows()=='1' && password_verify($password, $query->row('password'))) {
 +			return true;
 +		}
 +		else return false;
 +	}
-+	
++
 +}
 +
 +/* End of file api_model.php */
