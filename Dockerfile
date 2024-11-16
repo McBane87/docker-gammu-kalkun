@@ -5,7 +5,7 @@ ARG ENV_LANG="en_GB.UTF-8"
 ARG ENV_container="docker"
 ARG IMAGE_PREFIX="amd64"
 
-FROM ${IMAGE_PREFIX}/debian:bookworm-slim as build
+FROM --platform=linux/${IMAGE_PREFIX} debian:bookworm-slim as build
 
 ARG ENV_LC_ALL
 ENV LC_ALL=${ENV_LC_ALL}
@@ -33,20 +33,20 @@ ARG MISC_PAK="ca-certificates locales rsync"
 ARG APP_PAK="mariadb-server mariadb-client gammu gammu-smsd apache2 php8.1 php8.1-mysql php8.1-mbstring php8.1-curl php8.1-intl php8.1-ldap php8.1-xml libapache2-mod-php8.1"
 
 # Crossbuild files
-COPY arm/* /usr/bin/cross/arm32v7/
-COPY aarch64/* /usr/bin/cross/arm64v8/
+COPY arm/* /usr/bin/cross/arm/v7/
+COPY aarch64/* /usr/bin/cross/arm64/v8/
 COPY files/busybox-x86_64 /usr/bin/
 
 # Change default shell to bash for building
 RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "busybox-x86_64 cp -a /bin/sh /bin/sh.orig && busybox-x86_64 ln -sf /bin/bash /bin/sh"]
 
 # Provide crossbuild files
-RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "if [ ${IMAGE_PREFIX} != amd64 -a ${IMAGE_PREFIX} != i386 ]; then \
+RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "if [ ${IMAGE_PREFIX} != amd64 -a ${IMAGE_PREFIX} != 386 ]; then \
     busybox-x86_64 cp -av /usr/bin/cross/${IMAGE_PREFIX}/* /usr/bin/ && \
     busybox-x86_64 cp -a /bin/sh /bin/sh.real; fi"]
 
 # Start crossbuild
-RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "if [ ${IMAGE_PREFIX} != amd64 -a ${IMAGE_PREFIX} != i386 ]; then \
+RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "if [ ${IMAGE_PREFIX} != amd64 -a ${IMAGE_PREFIX} != 386 ]; then \
     cross-build-start; fi"]
 
 # build files
@@ -188,7 +188,7 @@ RUN \
     rm -rf /var/run/* && mkdir /var/run/lock
 
 # End crossbuild
-RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "if [ ${IMAGE_PREFIX} != amd64 -a ${IMAGE_PREFIX} != i386 ]; then \
+RUN [ "/usr/bin/busybox-x86_64", "sh", "-c", "if [ ${IMAGE_PREFIX} != amd64 -a ${IMAGE_PREFIX} != 386 ]; then \
     cross-build-end; fi"]
 
 # Change default shell back to dist-default
