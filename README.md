@@ -7,7 +7,6 @@ So because it is based on supervisord and has all needed packages included at on
 |Tag|Architecture|
 |-----|------------------|
 |latest|amd64|
-|latest-i386|i386|
 |latest-arm32v7|armhf|
 |latest-arm64v8|arm64|
 
