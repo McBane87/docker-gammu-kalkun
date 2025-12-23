@@ -1,6 +1,6 @@
---- media/css/base.css	2024-11-03 08:48:55.357541786 +0000
-+++ media/css/base.css	2024-11-03 15:30:51.936730357 +0000
-@@ -858,8 +858,8 @@
+--- ../Kalkun.Orig/media/css/base.css	2025-12-23 09:57:05.516802699 +0100
++++ media/css/base.css	2025-12-23 16:49:35.705565453 +0100
+@@ -860,8 +860,8 @@
  
  #message_holder {
  	min-height: 200px;
@@ -11,7 +11,7 @@
  	margin: 0;
  	padding: 0;
  }
-@@ -874,7 +874,7 @@
+@@ -876,7 +876,7 @@
  	background: #cce9f2;
  	font-weight: bold;
  	cursor: pointer;
@@ -20,7 +20,7 @@
  }
  
  .move_to:hover {
-@@ -918,7 +918,7 @@
+@@ -920,7 +920,7 @@
  
  
  #window_container {
@@ -29,7 +29,7 @@
  	padding: 0px 8px 20px 8px;
  }
  
-@@ -971,7 +971,7 @@
+@@ -973,7 +973,7 @@
  }
  
  #window_sub_header li a.active {
@@ -38,7 +38,7 @@
  	color: #FFF;
  }
  
-@@ -1073,11 +1073,11 @@
+@@ -1075,11 +1075,11 @@
  
  /* Base */
  .base_color {
@@ -52,8 +52,22 @@
  }
  
  .underline_link {
---- media/css/blue.css	2024-11-03 08:48:55.357541786 +0000
-+++ media/css/blue.css	2024-11-03 15:30:51.191728942 +0000
+@@ -1169,11 +1169,11 @@
+ }
+ 
+ .bttn-container {
+-	background: #86C0D2;
++	background: #767676;
+ 	margin: 0px;
+ 	padding: 5px;
+ 	overflow: auto;
+-	color: #444;
++	color: #000;
+ }
+ 
+ .bttn-container:after {
+--- ../Kalkun.Orig/media/css/blue.css	2025-12-23 09:57:05.516802699 +0100
++++ media/css/blue.css	2025-12-23 12:01:33.097137954 +0100
 @@ -1,30 +1,30 @@
  /* Kalkun CSS - Blue Theme */
  
@@ -209,53 +223,3 @@
  }
  
  .error_notif {
---- media/css/jquery-plugin/jquerycssmenu.css	2024-11-03 08:48:55.358541788 +0000
-+++ media/css/jquery-plugin/jquerycssmenu.css	2024-11-03 15:30:50.055726785 +0000
-@@ -1,5 +1,5 @@
- .jquerycssmenu{
--background: #86C0D2;
-+background: #767676;
- font-size: 11px;
- margin: 0px;
- padding: 5px;
-@@ -18,8 +18,8 @@
- position: relative;
- display: inline;
- float: left;
--}
--
-+}
-+
- .jquerycssmenu ul li.paging{
- text-align: right;
- float: right;
-@@ -39,13 +39,13 @@
- padding: 1px 8px;
- border: 1px outset #F0F0F0;
- }
--
--
--.jquerycssmenu ul li div#paging {
--	display: inline;
--	background: none;	
--} 
--
-+
-+
-+.jquerycssmenu ul li div#paging {
-+	display: inline;
-+	background: none;	
-+} 
-+
- 
- .jquerycssmenu ul li a:hover{
- 	
-@@ -74,7 +74,7 @@
- /* Sub level menu links style */
- .jquerycssmenu ul li ul li a{
- width: 160px; /*width of sub menus*/
--background: #86C0D2;
-+background: #767676;
- color: #FFF;
- padding: 4px 5px;
- margin: 0;

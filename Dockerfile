@@ -25,12 +25,13 @@ ENV container=${ENV_container}
 ARG IMAGE_PREFIX
 ENV IMAGE_PREFIX=${IMAGE_PREFIX}
 
-ARG KALKUN_VER="v0.8.2.1"
+ARG KALKUN_VER="v0.8.3.2"
 ARG BUILD_PAK="curl wget git jq unzip lsb-release file dos2unix patch"
 ARG SUPV_PAK="tzdata cron logrotate supervisor"
 ARG MISC_PAK="ca-certificates locales rsync"
-# Kalkun is not yet PHP 8.2 ready, so for now, we use 8.1
-ARG APP_PAK="mariadb-server mariadb-client gammu gammu-smsd apache2 php8.1 php8.1-mysql php8.1-mbstring php8.1-curl php8.1-intl php8.1-ldap php8.1-xml libapache2-mod-php8.1"
+ARG APP_PAK_0="mariadb-server mariadb-client gammu gammu-smsd apache2"
+ARG APP_PAK_82="php8.2 php8.2-mysql php8.2-mbstring php8.2-curl php8.2-intl php8.2-ldap php8.2-xml libapache2-mod-php8.2"
+ARG APP_PAK_84="php8.4 php8.4-mysql php8.4-mbstring php8.4-curl php8.4-intl php8.4-ldap php8.4-xml libapache2-mod-php8.4"
 
 # Crossbuild files
 COPY arm/* /usr/bin/cross/arm/v7/
@@ -69,13 +70,20 @@ COPY files/mariadb-post.sh /opt/mariadb-post.sh
 RUN \
     apt-get update && \
     apt-get install -y ${BUILD_PAK} ${MISC_PAK} && \
-    wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
+    if [ "$IMAGE_PREFIX" != "386" ]; then \
+        wget -qO /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list \
+    ;fi
 
 # Install production packages
 RUN \
     apt-get update && \
-    apt-get install -y ${SUPV_PAK} ${MISC_PAK} ${APP_PAK}
+    apt-get install -y ${SUPV_PAK} ${MISC_PAK} ${APP_PAK_0} && \
+    if [ "$IMAGE_PREFIX" == "386" ]; then \
+        apt-get install -y ${APP_PAK_82} \
+    ;else \
+        apt-get install -y ${APP_PAK_84} \
+    ;fi
 
 # Install Gammu examples, which, for some reason, not get installed by default
 RUN \
@@ -100,7 +108,7 @@ RUN \
     chown -R www-data:www-data /var/www
 
 # Configure locales
-RUN localedef -i ${ENV_LANG%%.*} -c -f ${ENV_LANG#*.} -A /usr/share/locale/locale.alias ${ENV_LANG}
+RUN sed -i "/${ENV_LANG}/s/^# //g" /etc/locale.gen && locale-gen
 
 # Configure Apache
 RUN \
@@ -113,10 +121,19 @@ RUN \
 
 # Configure PHP
 RUN \
-    mkdir /var/log/php && \
-    echo -e "/var/log/php/error.log {\n  rotate 5\n  size 10M\n  compress\n  missingok\n  notifempty\n}" > /etc/logrotate.d/php && \
-    sed -i -e 's#^\s*;*error_log\s*=\s*php_errors.log.*$#error_log = /var/log/php/error.log#g' /etc/php/8.1/apache2/php.ini && \
-    sed -i -e 's#^\s*;*error_log\s*=\s*php_errors.log.*$#error_log = /var/log/php/error.log#g' /etc/php/8.1/cli/php.ini
+    mkdir -m 775 /var/log/php && \
+    chown -R root:www-data /var/log/php && \
+    touch /var/log/php/error.log && \
+    chown root:www-data /var/log/php/error.log && \
+    chmod 664 /var/log/php/error.log && \
+    echo -e "/var/log/php/error.log {\n  rotate 5\n  size 10M\n  compress\n  missingok\n  notifempty\n  create 664 root www-data}" > /etc/logrotate.d/php && \
+    if [ "$IMAGE_PREFIX" == "386" ]; then \
+        sed -i -e 's#^\s*;*error_log\s*=\s*php_errors.log.*$#error_log = /var/log/php/error.log#g' /etc/php/8.2/apache2/php.ini && \
+        sed -i -e 's#^\s*;*error_log\s*=\s*php_errors.log.*$#error_log = /var/log/php/error.log#g' /etc/php/8.2/cli/php.ini \
+    ;else \
+        sed -i -e 's#^\s*;*error_log\s*=\s*php_errors.log.*$#error_log = /var/log/php/error.log#g' /etc/php/8.4/apache2/php.ini && \
+        sed -i -e 's#^\s*;*error_log\s*=\s*php_errors.log.*$#error_log = /var/log/php/error.log#g' /etc/php/8.4/cli/php.ini \
+    ;fi
 
 # Configure Kalkun
 RUN \
@@ -147,6 +164,7 @@ RUN \
     mysql kalkun < /var/www/application/sql/mysql/kalkun.sql && \
     mysql kalkun < /var/www/application/sql/mysql/pbk_gammu.sql && \
     mysql kalkun < /var/www/application/sql/mysql/pbk_kalkun.sql && \
+    mysql kalkun <<< "INSERT INTO kalkun (version) VALUES ('$(sed 's/[^0-9.]//g' <<< ${KALKUN_VER#v})');" && \
     mysql -e "GRANT USAGE on *.* to 'gammu'@'localhost' IDENTIFIED BY 'MAlST101qfMy6FGYKj5d';" && \
     mysql -e "GRANT ALL PRIVILEGES on kalkun.* to 'gammu'@'localhost';" && \
     sleep 5 && supervisorctl stop mariadb && killall supervisord || true

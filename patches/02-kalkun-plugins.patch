@@ -11,7 +11,7 @@
 + * @subpackage	Api
 + * @category	Models
 + */
-+class Api_model extends MY_Model {
++class Api_model extends CI_Model {
 +
 +	/**
 +	 * Constructor

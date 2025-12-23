@@ -70,27 +70,7 @@
 
  /*
  |--------------------------------------------------------------------------
---- application/config/config.php	2024-11-05 12:43:31.645458893 +0000
-+++ application/config/config.php	2024-11-05 14:26:20.789317184 +0000
-@@ -148,7 +148,7 @@
- | Note: This will NOT disable or override the CodeIgniter-specific
- |	autoloading (application/config/autoload.php)
- */
--$config['composer_autoload'] = 'vendor/autoload.php';
-+$config['composer_autoload'] = '../vendor/autoload.php';
-
- /*
- |--------------------------------------------------------------------------
-@@ -483,7 +483,7 @@
- $config['csrf_cookie_name'] = 'kalkun_csrf_cookie';
- $config['csrf_expire'] = 7200;
- $config['csrf_regenerate'] = TRUE;
--$config['csrf_exclude_uris'] = array();
-+$config['csrf_exclude_uris'] = array("plugin/(?:jsonrpc|rest_api|soap|xmlrpc)/.*");
-
- /*
- |--------------------------------------------------------------------------
---- index.php.orig	2024-11-05 15:12:49.241569398 +0000
+--- index.php	2024-11-05 15:12:49.241569398 +0000
 +++ index.php	2024-11-05 15:27:31.205437450 +0000
 @@ -97,7 +97,7 @@
   * This variable must contain the name of your "system" directory.
@@ -110,3 +90,24 @@
 
  /*
   *---------------------------------------------------------------
+--- application/config/config.php	2025-12-23 09:57:05.458802821 +0100
++++ application/config/config.php	2025-12-23 10:02:10.852161804 +0100
+@@ -148,7 +148,7 @@
+ | Note: This will NOT disable or override the CodeIgniter-specific
+ |	autoloading (application/config/autoload.php)
+ */
+-$config['composer_autoload'] = 'vendor/autoload.php';
++$config['composer_autoload'] = '../vendor/autoload.php';
+ 
+ /*
+ |--------------------------------------------------------------------------
+@@ -487,7 +487,8 @@
+     "install/requirement_check",
+     "plugin/soap/api", // we make a POST request when using soap api so skip csrf check (api requires login through token)
+     "install/database_setup",
+-    "install/config_setup");
++    "install/config_setup",
++    "plugin/(?:jsonrpc|rest_api|soap|xmlrpc)/.*");
+ 
+ /*
+ |--------------------------------------------------------------------------
